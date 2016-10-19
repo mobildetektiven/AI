@@ -13,22 +13,24 @@ class Stack:
 
 	def addCaskToStack(self,arrived_cask):
 		if self.occupiedStackSize() + arrived_cask.length <= self.size:
-			self.stored_casks.append(arrived_cask) #LEGG TIL HELE CASKEN...
+			self.stored_casks.append(arrived_cask) 
 		else:
 			print ("There is not enough room in this stack!")
 
 	def removeCaskFromStack(self):
 		if (self.stored_casks != None):
+			last_element = len(self.stored_casks)-1
+			loaded_cask = self.stored_casks[last_element]
 			self.stored_casks.pop()
+			print ("Picking up: ", loaded_cask)
 		else:
 			print ("There are no casks to pick up in this stack!")
-
-			#HER SKAL DU RETURNERE HVA SOM TAES UT AV STACKEN
+		return loaded_cask
 
 	def occupiedStackSize(self):
 		occ_size = 0
-		for cask_size in self.stored_casks:
-			occ_size += cask_size
+		for cask in self.stored_casks:
+			occ_size += cask.length
 		return occ_size
 
 class Node:
@@ -37,12 +39,11 @@ class Node:
 		self.node_number = node_number
 		self.stack = None
 
-# class Edge:
-# 	def __init__(self, e_id, end_node_1, end_node_2, length):
-# 		self.e_id = e_id
-# 		self.end_node_1 = end_node_1
-# 		self.end_node_2 = end_node_2
-# 		self.length
+class Edge:
+	def __init__(self, e_id, end_node_1, end_node_2, length):
+		self.end_node_1 = end_node_1
+		self.end_node_2 = end_node_2
+		self.length
 
 class State:
 	def __init__(self, weight, total_cost, loaded, previous_state, action):
@@ -58,9 +59,9 @@ class CTS:
 		self.loaded = None #Cask
 		self.goalCask = goal_cask
 
-	def nextActionList(self):
+	#def nextActionList(self):
 		#possible moves first
-		for node in self.location.
+	#	for node in self.location
 	
 	def moveCTS(self, edge):
 		if self.location == edge.end_node_1:
@@ -77,24 +78,33 @@ class CTS:
 			loaded = cask
 
 	def unload(self,cask):
-		if (loaded == !None):
+		if (loaded != None):
 			print ("There is nothing to unload - The CTS is empty")
 		else: 
 			loaded = None
 
 
-#Testing Code
-Cask1 = Cask(1,4,5)
-print(Cask1.length)
+	def allowedActions(self, adjacency_list, mode, total_number_of_nodes):  #may find another way to find total_number_of_nodes
+		allowed_actions_list = []
+		row = self.location.n_id
+		for column in total_number_of_nodes:
+			if adjacency_list[row][column] != 0: #gitt at vi setter inn 0 der det ikke ekstisterer edges
 
-listOfCasks = [Cask1]
+
+
+#Testing Code
+Cask1 = Cask(1,5,5)
+Cask2 = Cask(2,5,5)
+Cask3 = Cask(3,5,7)
+
+listOfCasks = [Cask1,Cask2]
 print (listOfCasks)
-# Stack1 = Stack(1,15,listOfCasks)
-# print (Stack1.stored_casks)
-# Stack1.addCaskToStack(Cask1)
-# print (Stack1.stored_casks)
-# Stack1.removeCaskFromStack()
-# print (Stack1.stored_casks)
+Stack1 = Stack(1,15,listOfCasks)
+print (Stack1.stored_casks)
+Stack1.addCaskToStack(Cask3)
+print (Stack1.stored_casks)
+Stack1.removeCaskFromStack()
+print (Stack1.stored_casks)
 
 # Node1 = Node(1,)
 # Node2 = Node()
