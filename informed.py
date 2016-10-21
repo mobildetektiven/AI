@@ -1,12 +1,8 @@
 class SearchProblem:
 	def __init__(self, adjacency_list):
 		self.adjacency_list = adjacency_list
-		self.CTS_state_last_visit_to_node = {} #To avoid having to check explored_states so that we can avoid expanding explored states
-		self.fringe = [] #heapifyed using heapq
-		self.states_explored = []
 	def fringeAddState(self, state):
 		#Add new state to sorted heap
-		
 	def fringeGetCheapestNextState(self):
 		#Return cheapest stat - pop from heapq
 	def stateExplored(self, state):
