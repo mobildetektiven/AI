@@ -12,7 +12,7 @@ class Stack:
 		self.stored_casks = stored_casks
 
 	def addCaskToStack(self,arrived_cask):
-		if self.occupiedStackSize() + arrived_cask.length <= self.size:
+		if self.stackSpaceOccupied() + arrived_cask.length <= self.size:
 			self.stored_casks.append(arrived_cask) 
 			return True
 		else:
@@ -28,11 +28,17 @@ class Stack:
 			print ("There are no casks to pick up in this stack!")
 			return False
 
-	def occupiedStackSize(self):
+	def stackSpaceOccupied(self):
 		occ_size = 0
 		for cask in self.stored_casks:
 			occ_size += cask.length
 		return occ_size
+
+	def stackSpaceFree(self):
+		occ_size = 0
+		for cask in self.stored_casks:
+			occ_size += cask.length
+		return self.size - occ_size		
 
 class Node:
 	def __init__(self, n_id, node_number, stack):
@@ -47,14 +53,16 @@ class Edge:
 		self.length = length
 
 class State:
-	def __init__(self, location, weight, total_cost, loaded, previous_state, action, goal_cask):
-		self.location = location #node name
-		self.weight = 1
+	def __init__(self, node,loaded, cost_of_action,total_cost, previous_state, action, cask):
+		self.location = node
+		self.loaded = loaded
+		self.cost_of_action = cost_of_action
 		self.total_cost = 0
-		self.loaded = False
+		self.cask = cask
+
+		#variables to simplify outputting solution
 		self.previous_state =  None
 		self.action = None
-		self.goal_cask = goal_cask
 
 
 # class CTS:
