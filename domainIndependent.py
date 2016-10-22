@@ -1,26 +1,33 @@
 
-from  import SearchProblem 
+from uninformed import SearchProblem
+import time
 
-
-func uniformCostSearch(SearchProblem, goal_state, initial_state):
+def uniformCostSearch(SearchProblem, goal_state, initial_state):
 	state = initial_state
-	SearchProblem.fringeAddstate(state)
+	SearchProblem.fringeAddState(state)
 
 	while True:
 		newState = False
-		while !newState:
+		while not newState:
 			state = SearchProblem.fringeGetCheapestNextState() #returns the cheapest state, false if fringe is empty
-			if state = False:
+			if state == False:
 				return False
-			if !SearchProblem.stateExplored(state):
-				newstate = True
+			if not SearchProblem.stateExplored(state):
+				newState = True
 		if SearchProblem.isGoalState(state, goal_state):
 			return SearchProblem.solution(state)
+		if(state.loaded):
+			print("my current state", state.location,state.loaded, state.total_cost, state.cask.c_id)
+		else:
+			print("my current state", state.location,state.loaded, state.total_cost)
 		SearchProblem.statesExploredAdd(state)
-		for child in SearchProblem.getstateChildren(state):
-			if !SearchProblem.stateExplored(child):
-				SearchProblem.fringeInsertChild(child)
-
+		children = SearchProblem.getStateChildren(state)
+		for child in children:
+			if not SearchProblem.stateExplored(child):
+				#print("new state to add: ", child.location,child.total_cost)
+				SearchProblem.fringeAddState(child)
+		time.sleep(.1)
+		#print(state.location,state.total_cost)
 
 
 

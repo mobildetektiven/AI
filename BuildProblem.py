@@ -1,21 +1,23 @@
 #This is our uninformed search algorithm
 
 from sys import argv
-from classes import Cask, Stack, Node, Edge
+from classes import Cask, Stack, Node, Edge, State
+from uninformed import SearchProblem, inf
+from domainIndependent import uniformCostSearch
+
 
 #Global variables 
 inputfile = argv[1]
 goal_cask = argv[2]
 casks = {}
-stacks = {}
+#stacks = {}
 nodes = {}
 edges = []
 node_name_to_num = {}
 node_num_to_name = {}
 goal_cask_loc = ""
 num_nodes = 0
-
-inf = 9999
+goal_node = "EXIT"
 
 
 
@@ -48,7 +50,8 @@ for line in file:
 			for cask in line:
 				x = casks.get(cask)
 				temp_stack.addCaskToStack(x)
-			stacks[temp_stack.s_id] = temp_stack
+
+			#stacks[temp_stack.s_id] = temp_stack
 			
 			node_name = temp_stack.s_id
 			nodes[node_name] = Node(node_name,num_nodes,temp_stack)
@@ -77,6 +80,11 @@ for line in file:
 			print("Unknown key in document")
 
 
+#build goal_state
+
+goal_state = State(goal_node,True,None,0,0,None,goal_cask)
+initial_state = State(goal_node,False,0,0,None,None,None)
+
 
 #build adjacency matrix, set all values to inf
 adj_matrix = [[inf for x in range(num_nodes)] for y in range(num_nodes)] 
@@ -91,37 +99,15 @@ for edge in edges:
 	adj_matrix[n2][n1] = edge.length
 
 
+problem = SearchProblem(adj_matrix, node_name_to_num,node_num_to_name, num_nodes, nodes, goal_cask, goal_node)
+
+success = uniformCostSearch(problem,goal_state,initial_state)
+if success:
+	print("you have found the solution")
+else:
+	print("you didn't find the solution")
 
 
-#debugg prints
-
-for node_num in node_num_to_name:
-	print(node_num, node_num_to_name[node_num])
-
-i = 0
-for row in adj_matrix:
-	print(i,row)
-	i += 1
-
-
-for key, stack in stacks.items():
-	print(key)
-	for cask in stack.stored_casks:
-		print(cask.c_id)
-stack = stacks["S1"]
-
-a = stack.removeCaskFromStack()
-print(a.c_id)
-
-for key, stack in stacks.items():
-	i = True
-	while i:
-		print(stack.s_id)
-		cask = stack.removeCaskFromStack()
-		if cask == False:
-			i = False
-		else:
-			print(cask.c_id)
 
 # 1 first find the cheapest way to the stack that holds our goal cask
 # 2 find the cheapest way to load the goal cask onto the CTS
