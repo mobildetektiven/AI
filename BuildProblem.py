@@ -1,67 +1,68 @@
-#This is our uninformed search algorithm
 
+
+#imports
+import os
 from sys import argv
 from classes import Cask, Stack, Node, Edge, State
-from uninformed import SearchProblem, inf
-from domainIndependent import uniformCostSearch
+from informed import SearchProblem, inf
+from domainIndependent import uniformCostSearch, printToFile
 
 
-#Global variables 
+#Global variables
+
+#store input variables
 inputfile = argv[1]
-goal_cask = argv[2]
+goal_cask_name = argv[2]
+
+#store all nodes, casks and stacks in dictonary
 casks = {}
 stacks = {}
 nodes = {}
+
+#used to build adjacency matrix
 edges = []
+
+#dictionaries to convert between node name and node number, for use with
+#print and adjacancy matrix
 node_name_to_num = {} 
 node_num_to_name = {} 
-goal_cask_loc = ""
 num_nodes = 0
 goal_node = "EXIT"
+goal_stack_name = ""
 
 
-
-#Collecting data from the input file build 
-
+#Collecting data from the input file and building objects 
 try:
 	file = open(inputfile)
 except IOError:
 	print ("unable to open file")
+	os._exit(0)
 
 for line in file:
-	#line = line.rstrip('\n')
 	if len(line) > 1:
 		key = line[0]
 		line = line.split()
-		print(line)
 
 		#build a cask object for each cask in the input file, store in a dictonary
 		if key == "C":
-			temp_cask = Cask(line[0],int(line[1]), float(line[2]))
-			casks[temp_cask.c_id] = temp_cask
+			new_cask = Cask(line[0],int(line[1]), float(line[2]), False)
+			casks[new_cask.c_id] = new_cask
 
-		#build a stack object for each stack in the input file
-		#Check if stack contains a cask, if so put cask in stack
-		#Build a node with the stack name, and store the stack in the node
-		#Give all nodes a uniqe number ID for use in adjacancy matrix
-		#store all nodes in a dictonary, using the number_id as key
-		#Store name connected to number in two different dictonaries for references	
+		#Build a node and a stack object for each stack, store stack in node
+		#Store list of cask names to enable storing of casks later
 		elif key == "S":
-			temp_stack = Stack(line.pop(0), int(line.pop(0)), [])
+			new_stack = Stack(line.pop(0), int(line.pop(0)), [])
 			for cask in line:
-				temp_stack.addCaskToStack(casks.get(cask))
-
-			stacks[temp_stack.s_id] = temp_stack
-			
-			node_name = temp_stack.s_id
+				new_stack.stored_casks.append(cask)
+			stacks[new_stack.s_id] = new_stack
+			node_name = new_stack.s_id
 			nodes[node_name] = Node(node_name,num_nodes,True)
 	
 			node_name_to_num[node_name] = num_nodes
 			node_num_to_name[num_nodes] = node_name
 			num_nodes += 1
 		
-		#Create an edge object for each edge, store it in a list. If new nodes are
-		#discovered, create a node object for them, and store in the node dictonary
+		#For each edge, check if nodes exist, if not create and store in nodes dict
 		elif key == "E":
 			n1 = line[1]
 			n2 = line[2]
@@ -79,71 +80,53 @@ for line in file:
 		else:
 			print("Unknown key in document")
 
-print(num_nodes)
-#build goal_state
-
-
-
-goal_state = State(goal_node,True,None,0,0,None,goal_cask, None, None, None, 0)
-initial_state = State(goal_node,False,0,0,None,None,None,stacks,[],{}, 0)
-
-#build adjacency matrix, set all values to inf
+#build adjacency matrix for all edges, set all values to Inf default
 adj_matrix = [[inf for x in range(num_nodes)] for y in range(num_nodes)] 
 
-print(adj_matrix)
-#do we need to set distance to ourselves = 0? 
-
-#Update adj. Matrix with node edges
+#Update adj. Matrix with node edges costs
 for edge in edges:
 	n1 = node_name_to_num[edge.end_node_1]
 	n2 = node_name_to_num[edge.end_node_2]
 	adj_matrix[n1][n2] = edge.length
 	adj_matrix[n2][n1] = edge.length
 
+# Store all discovered casks in their stack
+for stack_name, stack in stacks.items():
+	new_stored_casks = []
+	for cask in stack.stored_casks:
+		if cask == goal_cask_name:
+			goal_stack_name = stack_name
+		new_stored_casks.append(casks[cask])
+	stack.stored_casks = new_stored_casks
+if goal_stack_name == "":
+	print("Goal cask has no stack")
+	printToFile(["Goal cask has no stack"], "error.txt")
+	os._exit(0)
+blocking = False
+for cask in stacks[goal_stack_name].stored_casks:
+	if blocking:
+		cask.blocking_goal_cask = True
+	if cask.c_id == goal_cask_name:
+		blocking = True
 
-problem = SearchProblem(adj_matrix, node_name_to_num,node_num_to_name, num_nodes, goal_cask, goal_node)
+#Build goal and initial state
+goal_state = State(goal_node,True,None,0,0,None,goal_cask_name, None, None, None, 0, 0)
+initial_state = State(goal_node,False,0,0,None,None,None,stacks,[],{}, 0, 0)
 
-success = uniformCostSearch(problem,goal_state,initial_state)
-if success:
-	print("you have found the solution")
-else:
-	print("you didn't find the solution")
-
-
-
-# 1 first find the cheapest way to the stack that holds our goal cask
-# 2 find the cheapest way to load the goal cask onto the CTS
-# 3 return along the reversed path found in 1 
-
-#func build adjacencyList()
-
-#func find_next_states(current_state, allowed_actions, adjacency_list
-	#
-
-
-#Graph_Search(initial_state, goal_state, allowed actions, adjacency list)
-
-#	closed_states = None
-#	fringe = None
-#	state = initial_state
-	
- 
-#	while state != goal_state
-#	find next possible states based on current state and allowed actions 
-#	check if they are in the closed states list
-#	if not add to fringe and sort
-#	retreive next state from fringe
-#	update state variable, add new chain to action chained list 
+#Build searchProblem object, and send to search algorithm
+problem = SearchProblem(adj_matrix, node_name_to_num,node_num_to_name, num_nodes, goal_cask_name, goal_node)
+solution_path = uniformCostSearch(problem,goal_state,initial_state)
 
 
+# create file with input file name as argument
+save_to_file_name = ""
+for letter in inputfile:
+	if letter != ".":
+		save_to_file_name += letter
 
+save_to_file_name += goal_cask_name + "Solution"
 
+printToFile(solution_path,save_to_file_name)
+#Write solution to file
 
-
-
-#We start at the exit node, should implement some sort of uniform cost algorithm
-#to ensure finding the best way to the stack right away. 
-
-#Our nodes are placed in a list, the include a list of edges they point to
-#we must somehow store all explored nodes and the cost to reach them 
 

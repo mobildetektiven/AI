@@ -36,7 +36,13 @@ for key, stack in stacks.items():
 
 
 
+if(state.loaded):
+			print("my current state", state.location,state.loaded, state.total_cost, state.cask.c_id)
+		else:
+			print("my current state", state.location,state.loaded, state.total_cost)
 
+			
+#			print(state.location,state.action,state.total_cost)
 
 #Informed debugs
 
@@ -136,3 +142,13 @@ class Mission:
 			return True
 
 
+
+	def sorter(self,fringe):
+		for j in range(1, len(fringe)):
+			k = fringe[j]
+			i = j-1
+			while i >= 0 and fringe[i].total_cost > k.total_cost:
+				fringe[i+1] = fringe[i]
+				i = i - 1
+				fringe[i+1] = k
+		return fringe

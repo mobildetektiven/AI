@@ -1,0 +1,1 @@
+Goal cask has no stack

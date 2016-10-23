@@ -1,8 +1,12 @@
+
+#All classes used to solve the Search problem 
+
 class Cask:
-	def __init__(self, c_id, length, weight):
+	def __init__(self, c_id, length, weight,blocking_goal_cask):
 		self.c_id = c_id
 		self.length = length
 		self.weight = weight
+		self.blocking_goal_cask = blocking_goal_cask
 
 
 class Stack:
@@ -13,28 +17,22 @@ class Stack:
 
 	def addCaskToStack(self,arrived_cask):
 		if self.stackSpaceOccupied() + arrived_cask.length <= self.size:
-			self.stored_casks.append(arrived_cask)
-			for cask in self.stored_casks:
-				print("cask in stack", cask.c_id) 
+			self.stored_casks.append(arrived_cask) 
 			return True
 		else:
-			print ("There is not enough room in this stack!")
 			return False
 
 	def removeCaskFromStack(self):
 		if (len(self.stored_casks) > 0):
 			loaded_cask = self.stored_casks.pop()
-			#print ("Picking up: ", loaded_cask.c_id)
 			return loaded_cask
 		else:
-			print ("There are no casks to pick up in this stack!")
 			return False
 
 	def stackSpaceOccupied(self):
 		occ_size = 0
 		for cask in self.stored_casks:
 			occ_size += cask.length
-		print("space occupied ", occ_size)
 		return occ_size
 
 	def stackSpaceFree(self):
@@ -55,26 +53,39 @@ class Edge:
 		self.end_node_2 = end_node_2
 		self.length = length
 
+
+# Class used to represent the state of the CTS and to ensure no repeated states
 class State:
-	def __init__(self, node,loaded, cost_of_action,total_cost, previous_state, action, cask, stacks, cask_list, casks_handled, mission):
-		self.location = node
+	def __init__(self, location,loaded, cost_of_action,total_cost, previous_state, action, cask, stacks, cask_list, casks_handled, mission_num, heuristic):
+		self.location = location
 		self.loaded = loaded
 		self.cost_of_action = cost_of_action
 		self.total_cost = total_cost
 		self.cask = cask
-
-		#variables to simplify outputting solution
 		self.previous_state =  previous_state
 		self.action = action
-		self.stacks = stacks #dict holding all stacks and casks for this branch 
+		self.stacks = stacks 
+		self.heuristic = heuristic
+
+	#variables only used to avoid repeated states 
+		#Used to ensure a cask is not rehandled in the same mission 
 		self.casks_handled = casks_handled
+		#list of all casks that has been onboard the CTS, sorted
 		self.cask_list = cask_list
-		self.mission = mission
+		#For each time a cask is either loaded or unloaded, the misson num is increased
+		self.mission_num = mission_num
 
-	#function to enable use of heapq
-
+	#To enable comparison of two states 
 	def __lt__(self, other):
-		return self.total_cost < other.total_cost
+		return self.heuristic < other.heuristic
 
-	#def __cmp__(self,other):
-	#	return cmp(self.total_cost,other)
+	def calculateHeuristic(self,cask,total_cost, goal_cask):
+		if cask != None:
+			if(cask.blocking_goal_cask):
+				self.heuristic = (total_cost/5)
+			elif(cask.c_id == goal_cask):
+				self.heuristic = (total_cost/10)
+			else:
+				self.heuristic = total_cost
+		else:
+			self.heuristic = total_cost

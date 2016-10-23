@@ -1,38 +1,41 @@
 
 from uninformed import SearchProblem
-import time
 
+# The domain independent searcalgorithm, based on the uniform cost search model 
+# All domain specific parts are hidden in the SearchProblem object 
 def uniformCostSearch(SearchProblem, goal_state, initial_state):
 	state = initial_state
 	SearchProblem.fringeAddState(state)
-
+	i = 0
 	while True:
-		newState = False
-		state_cpy = state
-		while not newState:
-			state = SearchProblem.fringeGetCheapestNextState() #returns the cheapest state, false if fringe is empty
+		newState = True
+		while newState:
+			state = SearchProblem.fringeGetCheapestNextState() 
 			if state == False:
-				SearchProblem.solution(state_cpy)
-				return False
-			print(state.location,state.action,state.total_cost)
+				return []
+
+			#Check that state returned from fringe is a new state
 			if not SearchProblem.stateExplored(state):
-				newState = True
+				newState = False
 		if SearchProblem.isGoalState(state, goal_state):
 			return SearchProblem.solution(state)
-		if(state.loaded):
-			print("my current state", state.location,state.loaded, state.total_cost, state.cask.c_id)
-		else:
-			print("my current state", state.location,state.loaded, state.total_cost)
+		
 		SearchProblem.statesExploredAdd(state)
 		children = SearchProblem.getStateChildren(state)
 		for child in children:
-			#if not SearchProblem.stateExplored(child):
-				#print("new state to add: ", child.location,child.total_cost)
-				SearchProblem.fringeAddState(child)
-		#time.sleep(.1)
-		#print(state.location,state.total_cost)
+			SearchProblem.fringeAddState(child)
 
 
 
 
-	
+def printToFile(list_of_actions, filename):
+	try:
+		file = open(filename,'wt')
+		for line in list_of_actions:
+			line += '\n'
+			file.write(line)
+
+	except IOError:
+		print ("unable to open file")
+		os._exit(0)
+	file.close()
