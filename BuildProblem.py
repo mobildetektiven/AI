@@ -10,11 +10,11 @@ from domainIndependent import uniformCostSearch
 inputfile = argv[1]
 goal_cask = argv[2]
 casks = {}
-#stacks = {}
+stacks = {}
 nodes = {}
 edges = []
-node_name_to_num = {}
-node_num_to_name = {}
+node_name_to_num = {} 
+node_num_to_name = {} 
 goal_cask_loc = ""
 num_nodes = 0
 goal_node = "EXIT"
@@ -33,11 +33,12 @@ for line in file:
 	if len(line) > 1:
 		key = line[0]
 		line = line.split()
+		print(line)
 
 		#build a cask object for each cask in the input file, store in a dictonary
 		if key == "C":
 			temp_cask = Cask(line[0],int(line[1]), float(line[2]))
-			casks[line[0]] = temp_cask
+			casks[temp_cask.c_id] = temp_cask
 
 		#build a stack object for each stack in the input file
 		#Check if stack contains a cask, if so put cask in stack
@@ -48,13 +49,12 @@ for line in file:
 		elif key == "S":
 			temp_stack = Stack(line.pop(0), int(line.pop(0)), [])
 			for cask in line:
-				x = casks.get(cask)
-				temp_stack.addCaskToStack(x)
+				temp_stack.addCaskToStack(casks.get(cask))
 
-			#stacks[temp_stack.s_id] = temp_stack
+			stacks[temp_stack.s_id] = temp_stack
 			
 			node_name = temp_stack.s_id
-			nodes[node_name] = Node(node_name,num_nodes,temp_stack)
+			nodes[node_name] = Node(node_name,num_nodes,True)
 	
 			node_name_to_num[node_name] = num_nodes
 			node_num_to_name[num_nodes] = node_name
@@ -67,28 +67,30 @@ for line in file:
 			n2 = line[2]
 			edges.append(Edge(n1,n2,float(line[3])))
 			if n1 not in nodes:
-				nodes[n1] = Node(n1,num_nodes,None)
+				nodes[n1] = Node(n1,num_nodes,False)
 				node_name_to_num[n1] = num_nodes
 				node_num_to_name[num_nodes] = n1
 				num_nodes += 1
 			if n2 not in nodes:
-				nodes[n2] = Node(n2,num_nodes,None)
+				nodes[n2] = Node(n2,num_nodes,False)
 				node_name_to_num[n2] = num_nodes
 				node_num_to_name[num_nodes] = n2
 				num_nodes += 1
 		else:
 			print("Unknown key in document")
 
-
+print(num_nodes)
 #build goal_state
 
-goal_state = State(goal_node,True,None,0,0,None,goal_cask)
-initial_state = State(goal_node,False,0,0,None,None,None)
 
+
+goal_state = State(goal_node,True,None,0,0,None,goal_cask, None, None, None, 0)
+initial_state = State(goal_node,False,0,0,None,None,None,stacks,[],{}, 0)
 
 #build adjacency matrix, set all values to inf
 adj_matrix = [[inf for x in range(num_nodes)] for y in range(num_nodes)] 
 
+print(adj_matrix)
 #do we need to set distance to ourselves = 0? 
 
 #Update adj. Matrix with node edges
@@ -99,7 +101,7 @@ for edge in edges:
 	adj_matrix[n2][n1] = edge.length
 
 
-problem = SearchProblem(adj_matrix, node_name_to_num,node_num_to_name, num_nodes, nodes, goal_cask, goal_node)
+problem = SearchProblem(adj_matrix, node_name_to_num,node_num_to_name, num_nodes, goal_cask, goal_node)
 
 success = uniformCostSearch(problem,goal_state,initial_state)
 if success:

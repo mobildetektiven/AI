@@ -24,7 +24,7 @@ class Stack:
 	def removeCaskFromStack(self):
 		if (len(self.stored_casks) > 0):
 			loaded_cask = self.stored_casks.pop()
-			print ("Picking up: ", loaded_cask.c_id)
+			#print ("Picking up: ", loaded_cask.c_id)
 			return loaded_cask
 		else:
 			print ("There are no casks to pick up in this stack!")
@@ -47,7 +47,7 @@ class Node:
 	def __init__(self, n_id, node_number, stack):
 		self.n_id = n_id
 		self.node_number = node_number
-		self.stack = stack
+		self.has_stack = None
 
 class Edge:
 	def __init__(self, end_node_1, end_node_2, length):
@@ -56,7 +56,7 @@ class Edge:
 		self.length = length
 
 class State:
-	def __init__(self, node,loaded, cost_of_action,total_cost, previous_state, action, cask):
+	def __init__(self, node,loaded, cost_of_action,total_cost, previous_state, action, cask, stacks, cask_list, casks_handled, mission):
 		self.location = node
 		self.loaded = loaded
 		self.cost_of_action = cost_of_action
@@ -66,8 +66,15 @@ class State:
 		#variables to simplify outputting solution
 		self.previous_state =  previous_state
 		self.action = action
+		self.stacks = stacks #dict holding all stacks and casks for this branch 
+		self.casks_handled = casks_handled
+		self.cask_list = cask_list
+		self.mission = mission
 
 	#function to enable use of heapq
 
 	def __lt__(self, other):
 		return self.total_cost < other.total_cost
+
+	#def __cmp__(self,other):
+	#	return cmp(self.total_cost,other)

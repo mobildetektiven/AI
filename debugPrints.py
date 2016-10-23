@@ -100,3 +100,39 @@ for key, stack in stacks.items():
 # Node1 = Node(1,)
 # Node2 = Node()
 # Edge1 = Edge()
+
+
+	
+			if(state.loaded):
+				if state.location == prev_state.location and prev_state.mission_number == state.mission_number:
+					x = prev_state.casks_handled.get(state.cask.c_id)
+					print("x = ", x)
+					if x != None:
+						print("hei",prev_state.location, prev_state.mission_number)
+						return True
+				if prev_state.loaded:
+					if prev_state.cask.c_id == state.cask.c_id and prev_state.location and state.location:
+						if prev_state.action == "load" and state.action == "unload":
+							return True
+						elif prev_state.action == "unload" and state.action == "load":
+							return True
+				elif:
+					
+
+
+
+class Mission:
+	def __init__(self,mission_number,cask):
+		self.mission_number = mission_number
+		self.last_cask = cask
+
+		#[action,cask]
+
+	def appendAction(self,action):
+		self.actions.append(action)
+
+	def __eq__(self,other):
+		if self.mission_number == other.mission_number and self.last_cask == other.last_cask:
+			return True
+
+

@@ -8,10 +8,13 @@ def uniformCostSearch(SearchProblem, goal_state, initial_state):
 
 	while True:
 		newState = False
+		state_cpy = state
 		while not newState:
 			state = SearchProblem.fringeGetCheapestNextState() #returns the cheapest state, false if fringe is empty
 			if state == False:
+				SearchProblem.solution(state_cpy)
 				return False
+			print(state.location,state.action,state.total_cost)
 			if not SearchProblem.stateExplored(state):
 				newState = True
 		if SearchProblem.isGoalState(state, goal_state):
@@ -23,10 +26,10 @@ def uniformCostSearch(SearchProblem, goal_state, initial_state):
 		SearchProblem.statesExploredAdd(state)
 		children = SearchProblem.getStateChildren(state)
 		for child in children:
-			if not SearchProblem.stateExplored(child):
+			#if not SearchProblem.stateExplored(child):
 				#print("new state to add: ", child.location,child.total_cost)
 				SearchProblem.fringeAddState(child)
-		time.sleep(.1)
+		#time.sleep(.1)
 		#print(state.location,state.total_cost)
 
 
