@@ -1,0 +1,3 @@
+1) will the format for the input file always look like the example? Or do we need to write the code more robust? 
+
+2)
