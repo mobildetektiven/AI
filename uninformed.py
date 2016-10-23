@@ -23,29 +23,18 @@ class SearchProblem:
 
 		self.fringe = [] #heapifyed using heapq
 		self.states_explored = []
+		self.number_of_explored_states = 0
 
 
 	def fringeAddState(self, state):
 
-		# here we must sort on state.heuristic instead of total cost
-
 		self.fringe.append(state)
 		self.fringe.sort()
 		self.fringe.reverse()
-		
-		#heapq.heappush(self.fringe,state)
-		#heapq.heapify(self.fringe)
-		
-		#------------------------------remove later--------------------------
-		print("")
-		for el in self.fringe:
-			print("fringe: ", el.total_cost,el.location, "loaded",el.loaded)		
-		print("")
-		#--------------------------------remove later -----------------------
+	
 		
 	def fringeGetCheapestNextState(self):
 		try:
-			#state = heapq.heappop(self.fringe)
 			state = self.fringe.pop()
 			return state
 		except IndexError:
@@ -53,10 +42,7 @@ class SearchProblem:
 			return False
 		
 	def stateExplored(self, state):
-		#------------------------------remove --------------------------------	
-		print("state to check", state.location, "mission_num number" , state.mission_num)
-		#---------------------------------------------------------------------		
-		
+
 		# Avoid the repeated state of unloading a loaded cask back into its original 
 		# stack, without having to iterate through previous states  
 		if state.previous_state != None:
@@ -67,8 +53,7 @@ class SearchProblem:
 				elif state.action == "unload" and state.previous_state.action == "load":
 					return True	
 
-		#Check list of explored states if input state is a new state 
-		#
+		#Check list of explored states if input state is a new state
 		for prev_state in self.states_explored:
 			if(prev_state.location == state.location and prev_state.mission_num == state.mission_num):
 				same_list = True	
@@ -98,6 +83,7 @@ class SearchProblem:
 
 	#Build list with all steps taken to get the solution return the list
 	def solution(self,state):
+		print("total number of states explored", self.number_of_explored_states)
 		total_cost = state.total_cost
 		steps = []
 		looping = True
@@ -118,6 +104,7 @@ class SearchProblem:
 		return steps
 
 	def statesExploredAdd(self,state):
+		self.number_of_explored_states += 1
 		self.states_explored.append(state)
 
 

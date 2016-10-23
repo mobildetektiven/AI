@@ -4,7 +4,7 @@
 import os
 from sys import argv
 from classes import Cask, Stack, Node, Edge, State
-from informed import SearchProblem, inf
+from uninformed import SearchProblem, inf
 from domainIndependent import uniformCostSearch, printToFile
 
 
@@ -45,7 +45,7 @@ for line in file:
 
 		#build a cask object for each cask in the input file, store in a dictonary
 		if key == "C":
-			new_cask = Cask(line[0],int(line[1]), float(line[2]), False)
+			new_cask = Cask(line[0],int(line[1]), float(line[2]))
 			casks[new_cask.c_id] = new_cask
 
 		#Build a node and a stack object for each stack, store stack in node
@@ -102,16 +102,11 @@ if goal_stack_name == "":
 	print("Goal cask has no stack")
 	printToFile(["Goal cask has no stack"], "error.txt")
 	os._exit(0)
-blocking = False
-for cask in stacks[goal_stack_name].stored_casks:
-	if blocking:
-		cask.blocking_goal_cask = True
-	if cask.c_id == goal_cask_name:
-		blocking = True
+
 
 #Build goal and initial state
-goal_state = State(goal_node,True,None,0,0,None,goal_cask_name, None, None, None, 0, 0)
-initial_state = State(goal_node,False,0,0,None,None,None,stacks,[],{}, 0, 0)
+goal_state = State(goal_node,True,None,0,0,None,goal_cask_name, None, None, None, 0)
+initial_state = State(goal_node,False,0,0,None,None,None,stacks,[],{}, 0)
 
 #Build searchProblem object, and send to search algorithm
 problem = SearchProblem(adj_matrix, node_name_to_num,node_num_to_name, num_nodes, goal_cask_name, goal_node)

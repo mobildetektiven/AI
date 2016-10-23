@@ -2,11 +2,10 @@
 #All classes used to solve the Search problem 
 
 class Cask:
-	def __init__(self, c_id, length, weight,blocking_goal_cask):
+	def __init__(self, c_id, length, weight):
 		self.c_id = c_id
 		self.length = length
 		self.weight = weight
-		self.blocking_goal_cask = blocking_goal_cask
 
 
 class Stack:
@@ -56,7 +55,7 @@ class Edge:
 
 # Class used to represent the state of the CTS and to ensure no repeated states
 class State:
-	def __init__(self, location,loaded, cost_of_action,total_cost, previous_state, action, cask, stacks, cask_list, casks_handled, mission_num, heuristic):
+	def __init__(self, location,loaded, cost_of_action,total_cost, previous_state, action, cask, stacks, cask_list, casks_handled, mission_num):
 		self.location = location
 		self.loaded = loaded
 		self.cost_of_action = cost_of_action
@@ -64,8 +63,7 @@ class State:
 		self.cask = cask
 		self.previous_state =  previous_state
 		self.action = action
-		self.stacks = stacks 
-		self.heuristic = heuristic
+		self.stacks = stacks
 
 	#variables only used to avoid repeated states 
 		#Used to ensure a cask is not rehandled in the same mission 
@@ -77,15 +75,4 @@ class State:
 
 	#To enable comparison of two states 
 	def __lt__(self, other):
-		return self.heuristic < other.heuristic
-
-	def calculateHeuristic(self,cask,total_cost, goal_cask):
-		if cask != None:
-			if(cask.blocking_goal_cask):
-				self.heuristic = (total_cost/5)
-			elif(cask.c_id == goal_cask):
-				self.heuristic = (total_cost/10)
-			else:
-				self.heuristic = total_cost
-		else:
-			self.heuristic = total_cost
+		return self.total_cost < other.total_cost
